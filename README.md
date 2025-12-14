@@ -125,7 +125,7 @@ POST /api/full-health
 **Base URL**
 
 ```
-https://<your-deployed-domain>
+https://speakhealth-api.onrender.com/api
 ```
 
 ### Authorization
@@ -170,7 +170,7 @@ curl -X POST https://localhost:5001/api/full-health \
 {
   "name": "Full Health Check",
   "description": "Processes patient voice input to generate a clinical health summary.",
-  "endpoint": "https://<your-deployed-url>/api/full-health",
+  "endpoint": "[https://speakhealth-api.onrender.com/api](https://speakhealth-api.onrender.com/api)",
   "method": "POST",
   "headers": {
     "Content-Type": "multipart/form-data"
