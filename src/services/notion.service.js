@@ -1,23 +1,21 @@
 import { Client } from "@notionhq/client";
 
 const notion = new Client({
-  auth: process.env.NOTION_API_KEY,
+  auth: process.env.NOTION_API_KEY, // or NOTION_TOKEN — just be consistent
 });
 
 export const insertHealthRecord = async ({
   patientId,
-  // primarySymptom,
-  // symptoms,
-  // probableConditions,
-  // summary,
-  // severity,
- 
+  summary,
+  status = "New",
 }) => {
   try {
     await notion.pages.create({
       parent: {
         database_id: process.env.NOTION_DATABASE_ID,
       },
+
+      // 🧱 DATABASE COLUMNS
       properties: {
         "Patient ID": {
           title: [
@@ -27,40 +25,41 @@ export const insertHealthRecord = async ({
           ],
         },
 
-        "Date": {
+        "Visit Date": {
           date: {
             start: new Date().toISOString(),
           },
         },
 
-        // "Primary Symptom": {
-        //   select: primarySymptom
-        //     ? { name: primarySymptom }
-        //     : null,
-        // },
-
-        // "Symptoms": {
-        //   multi_select: symptoms.map((s) => ({ name: s })),
-        // },
-
-        // "Probable Conditions": {
-        //   multi_select: probableConditions.map((c) => ({ name: c })),
-        // },
-
-        // "Clinical Summary": {
-        //   rich_text: [
-        //     {
-        //       text: { content: summary },
-        //     },
-        //   ],
-        // },
-
-        // "Severity": {
-        //   select: severity ? { name: severity } : null,
-        // },
-
-       
+        "Status": {
+          select: {
+            name: status, // e.g. "New", "Reviewed", "Closed"
+          },
+        },
       },
+
+      // 📝 PAGE CONTENT (INSIDE THE ROW)
+      children: [
+        {
+          object: "block",
+          type: "heading_2",
+          heading_2: {
+            rich_text: [{ type: "text", text: { content: "Clinical Summary" } }],
+          },
+        },
+        {
+          object: "block",
+          type: "paragraph",
+          paragraph: {
+            rich_text: [
+              {
+                type: "text",
+                text: { content: summary || "No summary available." },
+              },
+            ],
+          },
+        },
+      ],
     });
   } catch (error) {
     console.error("Notion Insert Error:", error.body || error);

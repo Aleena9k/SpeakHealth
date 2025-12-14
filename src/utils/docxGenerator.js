@@ -14,37 +14,77 @@ export async function generateDocx(patientId, transcript, analysis) {
     sections: [
       {
         children: [
+          // ===== Title =====
           new Paragraph({
             text: "Patient Health Report",
             heading: HeadingLevel.HEADING_1,
+            spacing: { after: 300 },
           }),
 
           new Paragraph(`Patient ID: ${patientId}`),
-          new Paragraph(`Generated on: ${new Date().toLocaleString()}`),
+          new Paragraph({
+            text: `Generated on: ${new Date().toLocaleString()}`,
+            spacing: { after: 300 },
+          }),
 
-          new Paragraph({ text: "Transcript", heading: HeadingLevel.HEADING_2 }),
+          // ===== Transcript =====
+          new Paragraph({
+            text: "Transcript",
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 300, after: 150 },
+          }),
           new Paragraph(transcript || "N/A"),
 
-          new Paragraph({ text: "Extracted Symptoms", heading: HeadingLevel.HEADING_2 }),
+          // ===== Symptoms =====
+          new Paragraph({
+            text: "Extracted Symptoms",
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 300, after: 150 },
+          }),
           ...(symptoms.length
-            ? symptoms.map(s => new Paragraph(`• ${s}`))
+            ? symptoms.map(s =>
+                new Paragraph({
+                  text: s,
+                  bullet: { level: 0 },
+                })
+              )
             : [new Paragraph("No symptoms extracted.")]),
 
-          new Paragraph({ text: "Clinical Summary", heading: HeadingLevel.HEADING_2 }),
+          // ===== Clinical Summary =====
+          new Paragraph({
+            text: "Clinical Summary",
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 300, after: 150 },
+          }),
           new Paragraph(analysis.summary || "N/A"),
 
-          new Paragraph({ text: "Probable Conditions", heading: HeadingLevel.HEADING_2 }),
+          // ===== Conditions =====
+          new Paragraph({
+            text: "Probable Conditions",
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 300, after: 150 },
+          }),
           ...(conditions.length
-            ? conditions.map(c => new Paragraph(`• ${c}`))
+            ? conditions.map(c =>
+                new Paragraph({
+                  text: c,
+                  bullet: { level: 0 },
+                })
+              )
             : [new Paragraph("No conditions suggested.")]),
 
-          new Paragraph({ text: "Research References", heading: HeadingLevel.HEADING_2 }),
+          // ===== Research =====
+          new Paragraph({
+            text: "Research References",
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 300, after: 150 },
+          }),
           ...(research.length
-            ? research.map(r =>
-                new Paragraph(
-                  `${r.title || "Untitled"}\n${r.source || ""}\n${r.url || ""}`
-                )
-              )
+            ? research.flatMap(r => [
+                new Paragraph({ text: r.title || "Untitled", bold: true }),
+                ...(r.source ? [new Paragraph(r.source)] : []),
+                ...(r.url ? [new Paragraph(r.url)] : []),
+              ])
             : [new Paragraph("No research references found.")]),
         ],
       },
